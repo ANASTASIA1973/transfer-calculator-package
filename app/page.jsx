@@ -12,17 +12,14 @@ import SeatExtras from "./components/SeatExtras";
 import ExtrasStep from "./components/ExtrasStep";
 import ContactStep from "./components/ContactStep";
 
-export default function Home({ onOpenWishModal }) {
-  // Sprache aus Context
+export default function Page() {
   const { locale } = useLocale();
   const L = t[locale] || t.de;
 
-  // ── Schritt‐Navigation ────────────────────
   const [step, setStep] = React.useState(1);
   const next = () => setStep((s) => Math.min(6, s + 1));
   const back = () => setStep((s) => Math.max(1, s - 1));
 
-  // ── Form‐States (Schritte 1–5) ────────────
   const [orig, setOrig] = React.useState("");
   const [dest, setDest] = React.useState("");
   const [dateTime, setDateTime] = React.useState("");
@@ -50,7 +47,6 @@ export default function Home({ onOpenWishModal }) {
   });
   const [voucher, setVoucher] = React.useState("");
 
-  // ── Preisberechnung ───────────────────────
   const ratePerKm = 1.6;
   const rideDistance = distance * (isReturn ? 2 : 1);
   const ridePrice =
@@ -63,16 +59,14 @@ export default function Home({ onOpenWishModal }) {
   const vehicleSurcharge =
     vehicle === "familyVan" ? 50 : vehicle === "business" ? 100 : 0;
 
-  // Kindersitz-Kosten (erstes Kind gratis)
   const seatPrices = { baby: 5, child: 6, booster: 4 };
   const seatEntries = Object.entries(seatExtrasCounts);
   const allSeats = seatEntries
     .flatMap(([k, c]) => Array(c).fill(seatPrices[k]))
     .sort((a, b) => a - b);
-  allSeats.shift(); // günstigster gratis
+  allSeats.shift();
   const extrasSeatsCost = allSeats.reduce((sum, p) => sum + p, 0);
 
-  // Sonstige Extras-Kosten
   const extraPrices = {
     flowers: 35,
     wine: 39,
@@ -88,7 +82,6 @@ export default function Home({ onOpenWishModal }) {
     0
   );
 
-  // Rückfahr-Rabatt & Gutschein
   const returnDiscount = isReturn ? -10 : 0;
   const totalBeforeVoucher =
     ridePrice +
@@ -105,7 +98,6 @@ export default function Home({ onOpenWishModal }) {
   const totalRaw = totalBeforeVoucher - voucherDiscount;
   const totalPrice = Math.ceil(totalRaw);
 
-  // Detail-Listen für ContactStep
   const seatExtrasDetails = seatEntries
     .filter(([, c]) => c > 0)
     .map(([k, c]) => ({ key: k, count: c, unit: seatPrices[k] }));
@@ -119,10 +111,8 @@ export default function Home({ onOpenWishModal }) {
         {L.pageTitle || "Transfer & Tour-Service"}
       </h1>
 
-      {/* Globaler Step-Indikator */}
       <StepIndicator step={step} total={6} />
 
-      {/* Schritt-Komponenten */}
       {step === 1 && (
         <RouteStep
           orig={orig}
